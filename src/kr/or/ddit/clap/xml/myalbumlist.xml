@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- namespace속성 : 아래에서 작성한 SQL을 호출할 때 같이 사용된다. -->			
+<sqlMap namespace="myalbumlist">
+	
+	<update id="myalbumlistinsert" parameterClass="java.util.HashMap">
+		insert into myalbum_list (myalb_list_no, myalb_no, mus_no, myalb_list_indate)
+        values ( seq_myalb_list_no.nextval, #myalb_no#, #mus_no#, sysdate)
+	</update>
+	
+	<select id="selectMyAlbList" resultClass="MyAlbumListVO" parameterClass="MyAlbumListVO">
+			select distinct
+			    b.mus_no ,
+			    c.mus_title,
+			    a.myalb_no,
+			    d.alb_image,
+			    a.myalb_name,
+			    e.sing_name
+			from
+			    myalbum a,
+			    music c,
+			    myalbum_list b ,
+			    album d,
+			    singer e
+			where
+			    mem_id = #mem_id#
+			    and   b.myalb_no = a.myalb_no
+			    and   b.mus_no = c.mus_no
+			    and   d.alb_no = c.alb_no
+			    and   e.sing_no = d.sing_no
+			    and   a.myalb_no = #myalb_no#
+	</select>
+	<delete id="deleteMyAlbList"  parameterClass="MyAlbumListVO">
+	   delete from myalbum_list 
+	    where mus_no=#mus_no#
+        and myalb_no=#myalb_no#
+         
+	</delete>
+	 
+	
+</sqlMap>			
+
+
+
+
+

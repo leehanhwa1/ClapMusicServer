@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- namespace속성 : 아래에서 작성한 SQL을 호출할 때 같이 사용된다. -->			
+<sqlMap namespace="playlist">
+	
+	<select id="playlistselect" resultClass="playlistVO" parameterClass="String">
+	 select 
+	  		 a.mus_title,
+	         a.mus_lyrics,
+	         a.mus_file,
+	         a.mus_no,
+	         b.alb_image,
+	         c.sing_name,
+             d.play_no
+	    from music a, album b, singer c, playlist d
+	   where a.alb_no = b.alb_no
+	     and a.mus_no = d.mus_no
+	     and b.sing_no = c.sing_no
+	     and d.mem_id = #mem_id#
+	   order by d.play_no
+	</select>
+	
+	<update id="playlistinsert" parameterClass="playlistVO">
+		merge into playlist
+		      using dual
+		      on (
+		          mus_no = #mus_no#
+                  and mem_id = #mem_id#
+		         )
+		      when matched then
+		        update set
+		            play_indate = sysdate
+		        where mus_no = '10'
+		      when not matched then
+		        insert (play_no, play_indate, mus_no, mem_id)
+		         values (seq_play_no.nextval, sysdate, #mus_no#, #mem_id#)
+	</update>
+	
+	<delete id="playlistdelete" parameterClass="playlistVO">
+		delete from playlist 
+              where mem_id = #mem_id# 
+                and mus_no = #mus_no#
+	</delete>
+	
+</sqlMap>			
+
+
+
+
+

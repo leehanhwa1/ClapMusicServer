@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+         PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+         "http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- namespace속성 : 아래에서 작성한 SQL을 호출할 때 같이 사용된다. -->         
+<sqlMap namespace="ticket">
+   
+    
+    <select id="selectList" resultClass="ticketBuyVO">
+    	select mem_id, ticket_no, ticket_buydate from ticket_buy_list
+		where mem_id = #mem_id#
+    </select>
+    
+    <select id="selectTicket" resultClass="TicketVO" >
+    select ticket_no,
+		ticket_price,
+		ticket_content
+		from ticket
+    </select>
+    
+    <select id="selectTickBuyAllList" resultClass="ticketBuyVO" parameterClass="ticketBuyVO">
+	    select a.mem_id, a.ticket_no, a.ticket_buydate ,
+   			 b.ticket_price as price, a.ticket_buy_type ,a.card_bank_name
+		 from ticket_buy_list a, ticket b
+		 where  a.ticket_no= b.ticket_no
+		and  ticket_buydate between to_date(#ticket_buydate#, 'yyyy/mm/dd') and to_date(#ticket_buydate1#, 'yyyy/mm/dd')
+		 
+		  <isNotEmpty property="ticket_no" prepend="and">
+			b.ticket_no in(#ticket_no#,to_number(#ticket_no#)+1)
+		</isNotEmpty>
+		
+
+	<!--ticket_buydate:시작 , ticket_buydate1: 끝  -->
+    </select>
+    
+   	<insert id="insertTicketBuy" parameterClass="ticketBuyVO">
+		insert into ticket_buy_list (
+			ticket_buy_no,
+			ticket_buydate,
+			card_account_no,
+			ticket_buy_type,
+			card_bank_name,
+			refund_date,
+			refund_tf,
+			account_holder,
+			ticket_no,
+			mem_id)
+		values(			
+			seq_ticket_buy_no.nextval,
+			sysdate,
+			#card_account_no#,
+			#ticket_buy_type#,
+			#card_bank_name#,
+			#refund_date#,
+			#refund_tf#,
+			#account_holder#,
+			#ticket_no#,
+			#mem_id#)
+	</insert>
+	
+	<select id="selectTickChart" resultClass="ticketBuyVO" >
+	            
+		 select  (EXTRACT (YEAR FROM SYSDATE) - EXTRACT(YEAR FROM to_date(MEM_BIR))+1) as ticket_buy_no,
+ a.ticket_no,
+   			 sum(b.ticket_price) as price
+		 from ticket_buy_list a, ticket b ,member c
+		 where  a.ticket_no= b.ticket_no
+         and c.mem_id= a.mem_id
+          group by  a.ticket_no,(EXTRACT (YEAR FROM SYSDATE) - EXTRACT(YEAR FROM to_date(MEM_BIR))+1)
+	</select>
+	
+	 <select id="buyfind" resultClass="ticketBuyVO" parameterClass="String">
+    	select mem_id from ticket_buy_list
+		where mem_id = #mem_id#
+    </select>
+    
+    <select id="selectBuyAllist" resultClass="ticketBuyVO" parameterClass="String">
+    	
+    	  select
+    ticket_buy_no,
+    ticket_buydate,
+    card_account_no,
+    ticket_buy_type,
+    card_bank_name,
+    refund_date,
+    refund_tf,
+    account_holder,
+    ticket_no,
+    mem_id
+    from ticket_buy_list
+    where mem_id=#mem_id#
+         
+         
+    </select>
+
+</sqlMap>         
+
+
+
+

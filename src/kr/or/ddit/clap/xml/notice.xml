@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- namespace속성 : 아래에서 작성한 SQL을 호출할 때 같이 사용된다. -->			
+<sqlMap namespace="notice">
+
+	 <select id="selectListAll" resultClass="NoticeBoardVO">
+	 		select notice_no, notice_title, notice_indate, notice_view_cnt, mem_id from notice_board
+	 		order by notice_indate desc
+	 </select>
+
+
+	<select id="NoticeBoardDetailContent" resultClass="NoticeBoardVO" parameterClass="String">
+         
+		  select notice_no, notice_indate, notice_title,notice_view_cnt, notice_content, mem_id from notice_board where notice_no = #String#
+      </select>
+
+	<!-- 공지사항 글 등록 insert -->
+	<insert id="insertNotice" parameterClass="NoticeBoardVO">
+	<selectKey resultClass="String" keyProperty="notice_no">
+		select SEQ_NOTICE_NO.nextval from dual
+		</selectKey>
+		insert into notice_board
+				(notice_no,
+                notice_indate,
+                notice_title,
+                notice_content,
+                notice_view_cnt,
+                mem_id)
+        values (#notice_no#,
+                sysdate,
+                #notice_title#,
+                #notice_content#,
+                #notice_view_cnt#,
+                #mem_id#)
+		   
+	</insert>
+	
+	
+	<!-- 공지사항 글 수정 쿼리 -->
+	<update id="updateNotice" parameterClass="NoticeBoardVO">
+			update notice_board set 
+                notice_indate = sysdate,
+                notice_title = #notice_title#,
+                notice_content = #notice_content#,
+                notice_view_cnt = #notice_view_cnt#,
+                mem_id = #mem_id#
+            where notice_no=#notice_no#
+    </update>
+    
+    
+    <!-- 조회수 쿼리 -->
+    <update id="updateCount" parameterClass="String">
+    		update notice_board set
+    			   notice_view_cnt = notice_view_cnt +1 
+		     where notice_no = #String#
+    
+    </update>
+			
+	
+	
+
+
+
+	<!--  공지사항 글을 삭제하는 쿼리 -->
+	<delete id="deleteNoticeContent" parameterClass="String">
+			delete from notice_board where notice_no=#String#
+	 </delete>
+
+
+
+</sqlMap>

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- namespace속성 : 아래에서 작성한 SQL을 호출할 때 같이 사용된다. -->			
+<sqlMap namespace="qna">
+
+
+
+	<select id="selectListAll" resultClass="qnaVO">
+		select qna_no, qna_indate, qna_title, qna_view_cnt, mem_id from qna
+		order by qna_indate desc
+
+
+	</select>
+
+
+
+	<select id="selectQna" resultClass="qnaVO"
+		parameterClass="String">
+		select mem_id ,qna_no, qna_indate, qna_title, qna_view_cnt, mem_id
+		from qna
+
+		<dynamic prepend="where">
+			<isNotEmpty  prepend="and">
+				 mem_id=#mem_id#
+			</isNotEmpty>
+		</dynamic>
+		 order by qna_indate desc
+	</select>
+	
+	
+
+	<select id="qnaDetailContent" resultClass="qnaVO"
+		parameterClass="String">
+
+		select qna_type, qna_title, qna_indate, qna_content, mem_id from qna where
+		qna_no = #String#
+      </select>
+	 
+	 
+	<!-- 문의사항 글 등록 insert -->
+	<insert id="insertQna" parameterClass="qnaVO">
+	<selectKey resultClass="String" keyProperty="qna_no">
+		select SEQ_QNA_NO.nextval from dual
+		</selectKey>
+		insert into qna
+				(QNA_NO,
+                QNA_INDATE,
+                QNA_TITLE,
+                MEM_TEL,
+                MEM_EMAIL,
+                QNA_TYPE,
+                QNA_VIEW_CNT,
+                QNA_CONTENT,
+                MEM_ID)
+        values (#qna_no#,
+                sysdate,
+                #qna_title#,
+                #mem_tel#,
+                #mem_email#,
+                #qna_type#,
+                #qna_view_cnt#,
+                #qna_content#,
+                #mem_id#)
+		   
+	</insert>
+	
+	
+	
+	<!-- 댓글 등록 insert -->
+	<insert id="insertQnaReview" parameterClass="QnaReviewVO">
+	<!-- QNA_RE_NO 시퀀스 만들기 -->
+	<selectKey resultClass="String" keyProperty="qna_re_no">
+			select SEQ_QNA_RE_NO.nextval from dual
+	</selectKey>
+		insert into qna_review
+				(QNA_RE_NO, QNA_RE_CONTENT, QNA_RE_INDATE, MEM_ID, QNA_NO)
+		values
+				(#qna_re_no#, #qna_re_content#, sysdate, #mem_id#, #qna_no#)
+	
+	</insert>
+	
+	
+	
+	<!-- 댓글 나타내기select -->
+	<select id="selectListReviewAll" resultClass="QnaReviewVO" parameterClass="String">
+			select
+					qna_re_no, qna_re_content, qna_re_indate, mem_id, qna_no
+			  from 
+			  		qna_review
+             where 
+             		qna_no = #String#
+	</select>
+	
+	
+	
+	
+	
+	
+	<!-- 문의사항 글 수정 쿼리 -->
+	<update id="updateQna" parameterClass="qnaVO">
+	 		update qna set 
+					QNA_INDATE = sysdate,
+	                QNA_TITLE = #qna_title#,
+	                MEM_TEL = #mem_tel#,
+	                MEM_EMAIL = #mem_email#,
+	                QNA_TYPE = #qna_type#,
+	                QNA_CONTENT = #qna_content#,
+	                MEM_ID = #mem_id#
+        	where QNA_NO=#qna_no#
+	 </update>
+	
+	
+	<!-- 조회수 쿼리 -->
+	<update id="updateCount" parameterClass="String">
+    		update qna set
+    			   qna_view_cnt = qna_view_cnt +1 
+		     where qna_no = #String#
+    
+    </update>
+	
+	
+	
+	
+		
+	
+	<!--  문의사항 글을 삭제하는 쿼리 -->
+	<delete id="deleteQnaContent" parameterClass="String">
+			delete from qna where QNA_NO=#String#
+	 </delete>
+	
+	
+	
+
+</sqlMap>

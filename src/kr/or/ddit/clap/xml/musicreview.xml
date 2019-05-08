@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE sqlMap
+			PUBLIC "-//ibatis.apache.org//DTD SQL Map 2.0//EN"
+			"http://ibatis.apache.org/dtd/sql-map-2.dtd">
+<!-- namespace속성 : 아래에서 작성한 SQL을 호출할 때 같이 사용된다. -->
+<sqlMap namespace="musicreview">
+
+
+	<select id="selectReview" resultClass="MusicReviewVO" parameterClass="MusicReviewVO">
+    select mus_re_no,
+            mus_re_content,
+            mus_re_indate as indate,
+            mem_id,
+            mus_no 
+         from music_review where mem_id=#mem_id# union all
+   select  sing_re_no,
+            sing_re_content,
+            sing_re_indate as indate,
+            mem_id,
+            sing_no
+         from singer_review where  mem_id=#mem_id# union all
+     
+      select alb_re_no,
+            alb_re_content,
+            alb_re_indate as indate,
+            mem_id,
+            alb_no 
+         from album_review where  mem_id=#mem_id#
+            order by indate desc
+    </select>
+    
+    <select id="selectMusReview" resultClass="MusicReviewVO" parameterClass="MusicReviewVO">
+    	  select a.mus_re_no,
+            a.mus_re_content,
+            a.mus_re_indate,
+            a.mem_id,
+            b.mus_no,
+            b.mus_title,
+            c.alb_image,
+            d.sing_name
+         from music_review a, music b, album c,singer d
+         where a.mus_no = b.mus_no
+         and b.alb_no = c.alb_no
+            and c.sing_no = d.sing_no
+         and mem_id=#mem_id#
+    </select>
+    <delete id="deleteMusReview" parameterClass="MusicReviewVO">
+   		 delete  from music_review
+   		    where mem_id=#mem_id# 
+   			 and mus_re_no=#mus_re_no#
+    </delete>
+    
+    
+     <select id="selectAlbReview" resultClass="AlbumReviewVO" parameterClass="AlbumReviewVO">
+        select 
+           a.alb_re_no,
+            a.alb_re_content,
+            a.alb_re_indate,
+            a.mem_id,
+            c.alb_name,
+            a.alb_no,
+            c.alb_image,
+            d.sing_name
+         from ALBUM_REVIEW a,  album c,singer d
+         where a.alb_no = c.alb_no
+            and c.sing_no = d.sing_no
+         and mem_id=#mem_id# 
+    </select>
+    <delete id="deleteAlbReview" parameterClass="AlbumReviewVO">
+   		 delete  from ALBUM_REVIEW
+   		    where mem_id=#mem_id# 
+   			 and alb_re_no=#alb_re_no#
+    </delete>
+    
+      <select id="selectItsReview" resultClass="SingerReviewVO" parameterClass="SingerReviewVO">
+         select 
+           a.sing_re_no,
+            a.sing_re_content,
+            a.sing_re_indate,
+            a.mem_id,
+            d.sing_debut_era,
+            a.sing_no,
+            d.sing_image,
+            d.sing_name
+         from SINGER_REVIEW a,  singer d
+         where a.sing_no = d.sing_no
+         and mem_id=#mem_id# 
+    </select>
+    <delete id="deleteItsReview" parameterClass="SingerReviewVO">
+   		 delete  from SINGER_REVIEW
+   		    where mem_id=#mem_id# 
+   			 and sing_re_no=#sing_re_no#
+    </delete>
+    
+
+
+</sqlMap>			
+
+
+
+
+
